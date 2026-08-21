@@ -87,6 +87,20 @@
       footer { flex-direction: column; gap: 8px; }
     }
     @media (max-width: 420px) { .actions { flex-direction: column; } .button { width: 100%; } .panel-top { margin-bottom: 28px; } }
+
+    .partner-panel { margin-top: 40px; padding: clamp(24px, 4vw, 42px); border: 2px solid var(--ink); background: rgba(255,255,255,.65); box-shadow: var(--shadow); }
+    .partner-heading { margin: 0 0 6px; font-size: clamp(26px, 4vw, 34px); letter-spacing: -0.05em; }
+    .partner-panel > p { max-width: 480px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .partner-form { display: grid; gap: 16px; max-width: 520px; margin-top: 24px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font: 500 12px 'DM Mono', monospace; color: var(--muted); letter-spacing: .02em; }
+    .field input, .field textarea { font: inherit; font-size: 14px; padding: 12px 14px; border: 2px solid var(--ink); background: white; color: var(--ink); resize: vertical; }
+    .field input:focus, .field textarea:focus { outline: 3px solid #3d7ab8; outline-offset: 2px; }
+    .partner-form .button { width: fit-content; }
+    .form-status { margin: 0; font-size: 13px; min-height: 18px; }
+    .form-status.success { color: #1c7a3d; }
+    .form-status.error { color: #c0392b; }
+    @media (max-width: 420px) { .partner-form .button { width: 100%; } }
   </style>
 </head>
 <body>
@@ -124,6 +138,30 @@
           <div class="history-list" id="historyList"><p class="empty" id="emptyHistory">아직 기록이 없어요.<br>첫 번째 조합을 만들어보세요.</p></div>
         </aside>
       </div>
+
+      <section class="partner-panel" aria-labelledby="partner-title">
+        <span class="eyebrow">PARTNERSHIP</span>
+        <h2 class="partner-heading" id="partner-title">제휴 문의</h2>
+        <p>서비스 제휴나 광고 문의가 있으시면 아래 폼을 통해 편하게 연락 주세요.</p>
+
+        <form id="partnerForm" class="partner-form" action="https://formspree.io/f/mjyblabw" method="POST">
+          <div class="field">
+            <label for="partnerName">이름 / 회사명</label>
+            <input type="text" id="partnerName" name="name" required placeholder="홍길동 / OO컴퍼니">
+          </div>
+          <div class="field">
+            <label for="partnerEmail">이메일</label>
+            <input type="email" id="partnerEmail" name="email" required placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label for="partnerMessage">문의 내용</label>
+            <textarea id="partnerMessage" name="message" rows="5" required placeholder="제휴 제안 내용을 남겨주세요."></textarea>
+          </div>
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+          <button class="button primary" type="submit" id="partnerSubmit">문의 보내기 <span aria-hidden="true">→</span></button>
+          <p class="form-status" id="partnerStatus" role="status" aria-live="polite"></p>
+        </form>
+      </section>
     </main>
 
     <footer><span>GOOD LUCK, HAVE FUN.</span><span>본 서비스는 재미를 위한 번호 생성기입니다.</span></footer>
@@ -179,6 +217,40 @@
 
     drawButton.addEventListener('click', draw);
     resetButton.addEventListener('click', reset);
+
+    const partnerForm = document.getElementById('partnerForm');
+    const partnerSubmit = document.getElementById('partnerSubmit');
+    const partnerStatus = document.getElementById('partnerStatus');
+
+    partnerForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      partnerSubmit.disabled = true;
+      partnerStatus.className = 'form-status';
+      partnerStatus.textContent = '전송 중...';
+
+      try {
+        const response = await fetch(partnerForm.action, {
+          method: 'POST',
+          body: new FormData(partnerForm),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          partnerStatus.className = 'form-status success';
+          partnerStatus.textContent = '문의가 접수되었습니다. 감사합니다!';
+          partnerForm.reset();
+        } else {
+          const data = await response.json().catch(() => null);
+          partnerStatus.className = 'form-status error';
+          partnerStatus.textContent = data?.errors?.[0]?.message || '전송에 실패했습니다. 잠시 후 다시 시도해주세요.';
+        }
+      } catch (error) {
+        partnerStatus.className = 'form-status error';
+        partnerStatus.textContent = '전송에 실패했습니다. 네트워크를 확인해주세요.';
+      } finally {
+        partnerSubmit.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
