@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>행운 추첨소 | 로또 번호 생성기</title>
+  <meta name="description" content="가볍게 즐기는 로또 번호 추첨 사이트">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+    :root {
+      --ink: #202124;
+      --muted: #6b6d72;
+      --paper: #f8f7f2;
+      --line: #deddd6;
+      --yellow: #ffd43d;
+      --yellow-deep: #e4ae00;
+      --green: #9bd6ae;
+      --blue: #9dc8e8;
+      --red: #f2a2a2;
+      --purple: #c4b0e7;
+      --shadow: 5px 5px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#d8d7cf 0.8px, transparent 0.8px);
+      background-size: 18px 18px;
+      font-family: 'Space Grotesk', 'Apple SD Gothic Neo', sans-serif;
+    }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    .shell { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 28px 0 24px; border-bottom: 2px solid var(--ink); }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: -0.04em; }
+    .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border: 2px solid var(--ink); background: var(--yellow); box-shadow: 3px 3px 0 var(--ink); transform: rotate(-5deg); font-size: 19px; }
+    .brand span { font-size: 19px; }
+    .date { color: var(--muted); font: 500 12px 'DM Mono', monospace; letter-spacing: .02em; }
+    main { padding: 68px 0 72px; }
+    .intro { max-width: 690px; margin-bottom: 38px; }
+    .eyebrow { display: inline-block; margin-bottom: 13px; padding: 6px 10px; background: var(--ink); color: white; font: 500 11px 'DM Mono', monospace; letter-spacing: .07em; }
+    h1 { margin: 0; font-size: clamp(42px, 7vw, 78px); line-height: .95; letter-spacing: -0.075em; }
+    .intro p { max-width: 480px; margin: 20px 0 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, .75fr); gap: 28px; align-items: start; }
+    .draw-panel, .history-panel { border: 2px solid var(--ink); background: rgba(255,255,255,.65); }
+    .draw-panel { padding: clamp(24px, 4vw, 42px); box-shadow: var(--shadow); }
+    .panel-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 38px; }
+    .panel-title { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .03em; }
+    .round { color: var(--muted); font: 500 11px 'DM Mono', monospace; }
+    .numbers { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(9px, 2vw, 16px); min-height: 74px; margin-bottom: 42px; }
+    .ball { display: grid; place-items: center; width: clamp(48px, 8vw, 66px); aspect-ratio: 1; border: 2px solid var(--ink); border-radius: 50%; background: var(--yellow); box-shadow: 3px 3px 0 var(--ink); font-size: clamp(17px, 3vw, 23px); font-weight: 700; animation: pop .35s both; }
+    .ball:nth-child(2n) { background: var(--green); }
+    .ball:nth-child(3n) { background: var(--blue); }
+    .ball:nth-child(4n) { background: var(--red); }
+    .ball:nth-child(5n) { background: var(--purple); }
+    .ball.placeholder { background: #efeee8; color: #a2a29c; box-shadow: none; border-style: dashed; animation: none; }
+    @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.7); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .actions { display: flex; gap: 12px; }
+    .button { min-height: 50px; border: 2px solid var(--ink); padding: 0 20px; font-weight: 700; transition: transform .15s, box-shadow .15s; }
+    .button:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--ink); }
+    .button:active { transform: translate(0, 0); box-shadow: none; }
+    .button.primary { flex: 1; background: var(--yellow); }
+    .button.secondary { background: white; }
+    .button:focus-visible { outline: 3px solid #3d7ab8; outline-offset: 3px; }
+    .tip { margin: 25px 0 0; color: var(--muted); font-size: 12px; text-align: center; }
+    .history-panel { padding: 25px; }
+    .history-head { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 17px; border-bottom: 2px solid var(--ink); }
+    .history-head h2 { margin: 0; font-size: 16px; letter-spacing: -.04em; }
+    .history-count { color: var(--muted); font: 11px 'DM Mono', monospace; }
+    .history-list { display: grid; gap: 0; }
+    .history-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .history-balls { display: flex; flex-wrap: wrap; gap: 5px; }
+    .mini-ball { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--ink); border-radius: 50%; background: var(--yellow); font: 500 11px 'DM Mono', monospace; }
+    .mini-ball:nth-child(2n) { background: var(--green); } .mini-ball:nth-child(3n) { background: var(--blue); } .mini-ball:nth-child(4n) { background: var(--red); } .mini-ball:nth-child(5n) { background: var(--purple); }
+    .history-time { color: var(--muted); font: 10px 'DM Mono', monospace; white-space: nowrap; }
+    .empty { padding: 28px 0 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 20px 0 28px; color: var(--muted); font: 11px 'DM Mono', monospace; }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 560px); }
+      header { padding-top: 20px; } .date { display: none; }
+      main { padding: 48px 0 50px; } .layout { grid-template-columns: 1fr; }
+      .intro { margin-bottom: 28px; } .intro p { font-size: 14px; }
+      .draw-panel { box-shadow: 4px 4px 0 var(--ink); }
+      footer { flex-direction: column; gap: 8px; }
+    }
+    @media (max-width: 420px) { .actions { flex-direction: column; } .button { width: 100%; } .panel-top { margin-bottom: 28px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><div class="brand-mark" aria-hidden="true">✦</div><span>행운 추첨소</span></div>
+      <div class="date" id="today"></div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <span class="eyebrow">LOTTO 6 / 45</span>
+        <h1 id="page-title">오늘의 행운을<br>가볍게 뽑아보세요.</h1>
+        <p>마음에 드는 숫자가 나올 때까지, 버튼을 눌러 새로운 조합을 만들어보세요.</p>
+      </section>
+
+      <div class="layout">
+        <section class="draw-panel" aria-labelledby="draw-title">
+          <div class="panel-top">
+            <h2 class="panel-title" id="draw-title">행운 번호 조합</h2>
+            <span class="round" id="roundLabel">READY TO DRAW</span>
+          </div>
+          <div class="numbers" id="numbers" aria-live="polite" aria-label="추첨된 로또 번호">
+            <span class="ball placeholder">?</span><span class="ball placeholder">?</span><span class="ball placeholder">?</span><span class="ball placeholder">?</span><span class="ball placeholder">?</span><span class="ball placeholder">?</span>
+          </div>
+          <div class="actions">
+            <button class="button primary" id="drawButton" type="button">번호 생성하기 <span aria-hidden="true">→</span></button>
+            <button class="button secondary" id="resetButton" type="button">초기화</button>
+          </div>
+          <p class="tip">번호는 매번 무작위로 생성됩니다.</p>
+        </section>
+
+        <aside class="history-panel" aria-labelledby="history-title">
+          <div class="history-head"><h2 id="history-title">최근 추첨 기록</h2><span class="history-count" id="historyCount">0 PLAYS</span></div>
+          <div class="history-list" id="historyList"><p class="empty" id="emptyHistory">아직 기록이 없어요.<br>첫 번째 조합을 만들어보세요.</p></div>
+        </aside>
+      </div>
+    </main>
+
+    <footer><span>GOOD LUCK, HAVE FUN.</span><span>본 서비스는 재미를 위한 번호 생성기입니다.</span></footer>
+  </div>
+
+  <script>
+    const numbersElement = document.getElementById('numbers');
+    const drawButton = document.getElementById('drawButton');
+    const resetButton = document.getElementById('resetButton');
+    const historyList = document.getElementById('historyList');
+    const historyCount = document.getElementById('historyCount');
+    const roundLabel = document.getElementById('roundLabel');
+    const today = document.getElementById('today');
+    let drawCount = 0;
+
+    today.textContent = new Intl.DateTimeFormat('ko-KR', { dateStyle: 'long' }).format(new Date());
+
+    function createNumbers() {
+      const pool = Array.from({ length: 45 }, (_, index) => index + 1);
+      return pool.sort(() => Math.random() - 0.5).slice(0, 6).sort((a, b) => a - b);
+    }
+
+    function renderNumbers(numbers) {
+      numbersElement.innerHTML = numbers.map((number, index) => `<span class="ball" style="animation-delay: ${index * 45}ms">${number}</span>`).join('');
+    }
+
+    function addHistory(numbers) {
+      const time = new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `<div class="history-balls">${numbers.map(number => `<span class="mini-ball">${number}</span>`).join('')}</div><span class="history-time">${time}</span>`;
+      const emptyHistory = document.getElementById('emptyHistory');
+      if (emptyHistory) emptyHistory.remove();
+      historyList.prepend(item);
+      drawCount += 1;
+      historyCount.textContent = `${drawCount} ${drawCount === 1 ? 'PLAY' : 'PLAYS'}`;
+    }
+
+    function draw() {
+      const numbers = createNumbers();
+      renderNumbers(numbers);
+      addHistory(numbers);
+      roundLabel.textContent = `DRAW #${String(drawCount).padStart(2, '0')}`;
+    }
+
+    function reset() {
+      numbersElement.innerHTML = '<span class="ball placeholder">?</span>'.repeat(6);
+      roundLabel.textContent = 'READY TO DRAW';
+      historyList.innerHTML = '<p class="empty" id="emptyHistory">아직 기록이 없어요.<br>첫 번째 조합을 만들어보세요.</p>';
+      drawCount = 0;
+      historyCount.textContent = '0 PLAYS';
+    }
+
+    drawButton.addEventListener('click', draw);
+    resetButton.addEventListener('click', reset);
+  </script>
+</body>
+</html>

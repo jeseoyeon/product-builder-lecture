@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /workspaces/codespaces-blank status)"
+    ]
+  }
+}
