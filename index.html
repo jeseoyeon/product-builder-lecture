@@ -101,6 +101,9 @@
     .form-status.success { color: #1c7a3d; }
     .form-status.error { color: #c0392b; }
     @media (max-width: 420px) { .partner-form .button { width: 100%; } }
+
+    .comments-panel { margin-top: 40px; padding: clamp(24px, 4vw, 42px); border: 2px solid var(--ink); background: rgba(255,255,255,.65); box-shadow: var(--shadow); }
+    .comments-heading { margin: 0 0 20px; font-size: clamp(26px, 4vw, 34px); letter-spacing: -0.05em; }
   </style>
 </head>
 <body>
@@ -162,10 +165,30 @@
           <p class="form-status" id="partnerStatus" role="status" aria-live="polite"></p>
         </form>
       </section>
+
+      <section class="comments-panel" aria-labelledby="comments-title">
+        <span class="eyebrow">COMMENTS</span>
+        <h2 class="comments-heading" id="comments-title">댓글</h2>
+        <div id="disqus_thread"></div>
+      </section>
     </main>
 
     <footer><span>GOOD LUCK, HAVE FUN.</span><span>본 서비스는 재미를 위한 번호 생성기입니다.</span></footer>
   </div>
+
+  <script>
+    var disqus_config = function () {
+      this.page.url = window.location.href;
+      this.page.identifier = 'lotto-home';
+    };
+    (function() {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://productbuilder-xjwd5iqwdi.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
   <script>
     const numbersElement = document.getElementById('numbers');
