@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://product-builder-lecture-7hu.pages.dev/sitemap.xml
